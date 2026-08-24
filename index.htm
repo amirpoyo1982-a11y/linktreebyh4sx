@@ -1,0 +1,301 @@
+<html style="margin:0;padding:0;">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+(function(){
+  var s = document.createElement('style');
+  s.textContent = `
+    :root{
+      --bg:#0a0a18;
+      --card:rgba(255,255,255,0.08);
+      --card-solid:rgba(20,20,40,0.85);
+      --text:#f5f5ff;
+      --muted:#a0a0c0;
+      --accent:#e879f9;
+      --accent-soft:rgba(232,121,249,0.18);
+      --accent2:#fbbf24;
+      --accent2-soft:rgba(251,191,36,0.18);
+      --border:rgba(255,255,255,0.12);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:'Archivo',sans-serif;color:var(--text);background:var(--bg);overflow-x:hidden}
+    .bg-wrap{
+      position:fixed;inset:0;z-index:0;overflow:hidden;
+    }
+    .bg-img{
+      position:absolute;inset:-5%;
+      background:url('https://p16-flow-image-sign.ibyteimg.com/tos-mya-i-3rsxbfecgb/rc_gen_image/12e955a4b54645c1a0047984d37b9734.jpeg~tplv-0es2k971ck-image.image?rcl=2026082500030421798FCB4EC91A1012F1&rk3s=8e244e95&rrcfp=02a80fc2&x-expires=1790179438&x-signature=oQzMd028iQT6b4EEGd7WDKitbFk%3D') center/cover no-repeat;
+      animation:bgZoom 20s ease-in-out infinite alternate;
+      filter:saturate(1.1) brightness(0.75);
+    }
+    .bg-overlay{
+      position:absolute;inset:0;
+      background:
+        radial-gradient(ellipse at 20% 20%, rgba(168,85,247,0.35), transparent 50%),
+        radial-gradient(ellipse at 80% 80%, rgba(236,72,153,0.25), transparent 50%),
+        linear-gradient(180deg, rgba(10,10,24,0.4) 0%, rgba(10,10,24,0.75) 100%);
+    }
+    @keyframes bgZoom{
+      0%{transform:scale(1) translate(0,0)}
+      100%{transform:scale(1.12) translate(-1%,-1%)}
+    }
+    .star{
+      position:absolute;width:3px;height:3px;background:#fff;border-radius:50%;
+      animation:twinkle 3s ease-in-out infinite;
+    }
+    @keyframes twinkle{
+      0%,100%{opacity:0.2;transform:scale(0.8)}
+      50%{opacity:1;transform:scale(1.2)}
+    }
+    .sakura-petal{
+      position:absolute;width:14px;height:14px;
+      background:radial-gradient(circle at 30% 30%, #fbcfe8, #ec4899);
+      border-radius:150% 0 150% 0;
+      opacity:0.7;
+      animation:fall linear infinite;
+    }
+    @keyframes fall{
+      0%{transform:translateY(-20px) rotate(0deg);opacity:0}
+      10%{opacity:0.8}
+      90%{opacity:0.8}
+      100%{transform:translateY(100vh) rotate(540deg);opacity:0}
+    }
+    .main-wrap{position:relative;z-index:1;min-height:100%;padding:48px 20px}
+    .profile-card{
+      max-width:440px;margin:0 auto;
+      background:var(--card);
+      backdrop-filter:blur(20px);
+      -webkit-backdrop-filter:blur(20px);
+      border:1px solid var(--border);
+      border-radius:28px;
+      padding:36px 28px 28px;
+      text-align:center;
+      box-shadow:0 8px 40px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+      animation:fadeUp 0.8s ease forwards;
+      opacity:0;
+    }
+    @keyframes fadeUp{
+      from{opacity:0;transform:translateY(24px)}
+      to{opacity:1;transform:translateY(0)}
+    }
+    .avatar-ring{
+      width:120px;height:120px;margin:0 auto 20px;
+      border-radius:50%;
+      padding:4px;
+      background:linear-gradient(135deg, var(--accent), var(--accent2), var(--accent));
+      background-size:200% 200%;
+      animation:ringRotate 4s linear infinite;
+    }
+    @keyframes ringRotate{
+      0%{background-position:0% 50%}
+      100%{background-position:200% 50%}
+    }
+    .avatar-inner{
+      width:100%;height:100%;border-radius:50%;
+      overflow:hidden;
+      background:#1a1a2e;
+    }
+    .avatar-inner img{
+      width:100%;height:100%;object-fit:cover;display:block;
+    }
+    .name{
+      font-family:'Syne',sans-serif;font-size:28px;font-weight:800;margin-bottom:6px;
+      background:linear-gradient(100deg,#fff,var(--accent),var(--accent2));
+      -webkit-background-clip:text;background-clip:text;color:transparent;
+      letter-spacing:-0.02em;
+    }
+    .handle{
+      font-size:14px;color:var(--muted);margin-bottom:14px;
+      font-family:'Archivo',sans-serif;
+    }
+    .bio{
+      font-size:14px;color:#d0d0e8;line-height:1.6;margin-bottom:22px;
+      font-family:'Archivo',sans-serif;
+    }
+    .location{
+      display:inline-flex;align-items:center;gap:6px;
+      font-size:12px;color:var(--muted);
+      padding:6px 14px;border-radius:20px;
+      background:rgba(255,255,255,0.06);
+      border:1px solid var(--border);
+      margin-bottom:4px;
+    }
+    .links-wrap{max-width:440px;margin:24px auto 0}
+    .link-btn{
+      display:flex;align-items:center;gap:14px;
+      width:100%;padding:14px 18px;margin-bottom:12px;
+      background:var(--card);
+      backdrop-filter:blur(16px);
+      -webkit-backdrop-filter:blur(16px);
+      border:1px solid var(--border);
+      border-radius:16px;
+      color:var(--text);text-decoration:none;
+      font-family:'Archivo',sans-serif;font-size:15px;font-weight:500;
+      transition:all 0.3s cubic-bezier(0.4,0,0.2,1);
+      cursor:pointer;
+      opacity:0;
+      animation:fadeUp 0.6s ease forwards;
+    }
+    .link-btn:nth-child(1){animation-delay:0.15s}
+    .link-btn:nth-child(2){animation-delay:0.25s}
+    .link-btn:nth-child(3){animation-delay:0.35s}
+    .link-btn:nth-child(4){animation-delay:0.45s}
+    .link-btn:nth-child(5){animation-delay:0.55s}
+    .link-btn:nth-child(6){animation-delay:0.65s}
+    .link-btn:hover{
+      transform:translateY(-3px) scale(1.01);
+      border-color:var(--accent);
+      background:rgba(232,121,249,0.1);
+      box-shadow:0 8px 30px rgba(232,121,249,0.25);
+    }
+    .link-icon{
+      width:56px;height:56px;border-radius:14px;flex-shrink:0;
+      background:var(--accent-soft);
+      display:flex;align-items:center;justify-content:center;
+      color:var(--accent);
+      overflow:hidden;
+    }
+    .link-icon img{
+      width:100%;height:100%;object-fit:contain;display:block;
+    }
+    .link-text{flex:1;text-align:left}
+    .link-title{font-weight:600;font-size:15px}
+    .link-desc{font-size:12px;color:var(--muted);margin-top:2px}
+    .link-arrow{
+      color:var(--muted);
+      transition:transform 0.3s ease, color 0.3s ease;
+    }
+    .link-btn:hover .link-arrow{
+      transform:translateX(4px);
+      color:var(--accent);
+    }
+    .social-row{
+      display:flex;justify-content:center;gap:12px;
+      margin-top:28px;
+      opacity:0;
+      animation:fadeUp 0.6s ease 0.75s forwards;
+    }
+    .social-btn{
+      width:44px;height:44px;border-radius:12px;
+      display:flex;align-items:center;justify-content:center;
+      background:var(--card);
+      backdrop-filter:blur(12px);
+      border:1px solid var(--border);
+      color:var(--muted);text-decoration:none;
+      transition:all 0.3s ease;
+    }
+    .social-btn:hover{
+      color:var(--accent);
+      border-color:var(--accent);
+      transform:translateY(-2px);
+      box-shadow:0 4px 20px rgba(232,121,249,0.2);
+    }
+    .footer-text{
+      text-align:center;margin-top:28px;font-size:12px;color:var(--muted);
+      opacity:0;animation:fadeUp 0.6s ease 0.85s forwards;
+      font-family:'Archivo',sans-serif;
+    }
+    .verified-badge{
+      display:inline-flex;align-items:center;gap:4px;
+      margin-left:6px;vertical-align:middle;
+    }
+  `;
+  document.head.appendChild(s);
+})();
+</script>
+<div style="background-color:transparent;box-sizing:border-box;">
+  <div class="bg-wrap">
+    <div class="bg-img"></div>
+    <div class="bg-overlay"></div>
+  </div>
+  <div class="main-wrap" id="mainWrap">
+    <div class="profile-card">
+      <div class="avatar-ring">
+        <div class="avatar-inner">
+          <img src="https://i.imgur.com/cLPulXQ.png" alt="H4SX Logo" onerror="this.style.display='none'">
+        </div>
+      </div>
+      <div class="name">
+        H4SX Gateway
+        <span class="verified-badge">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" fill="#e879f9"/>
+            <path d="M8.5 12.5l2.5 2.5 5-5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+      </div>
+      <div class="handle">@h4sx.official</div>
+      <div class="bio">Free Fire Sensitivity Generator | Pro Player Presets | Official website | Support whatsapp</div>
+      <div class="location">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+          <circle cx="12" cy="10" r="3"/>
+        </svg>
+        Kedah, Malaysia
+      </div>
+    </div>
+    <div class="links-wrap">
+
+      <a class="link-btn" href="https://www.h4sxmy.xyz/" target="_blank">
+        <div class="link-icon" style="background:rgba(255,255,255,0.06);padding:4px;">
+          <img src="https://i.imgur.com/cLPulXQ.png" alt="H4SX">
+        </div>
+        <div class="link-text">
+          <div class="link-title">Website Rasmi</div>
+          <div class="link-desc">h4sx store official website</div>
+        </div>
+        <svg class="link-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="5" y1="12" x2="19" y2="12"/>
+          <polyline points="12 5 19 12 12 19"/>
+        </svg>
+      </a>
+
+      <a class="link-btn" href="h4sxsensiff.vercel.app" target="_blank">
+        <div class="link-icon" style="background:rgba(255,255,255,0.06);padding:4px;">
+          <img src="https://i.postimg.cc/wMC3PLWg/image.png" alt="Generate Sensi">
+        </div>
+        <div class="link-text">
+          <div class="link-title">Generate Sensi</div>
+          <div class="link-desc">nak aim gacor ikut device klick sini</div>
+        </div>
+        <svg class="link-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="5" y1="12" x2="19" y2="12"/>
+          <polyline points="12 5 19 12 12 19"/>
+        </svg>
+      </a>
+
+    </div>
+    <div class="footer-text">Made By | H4SX STORE</div>
+  </div>
+</div>
+<script>
+(function(){
+  var bgWrap = document.querySelector('.bg-wrap');
+  if(bgWrap){
+    for(var i=0;i<60;i++){
+      var star = document.createElement('div');
+      star.className = 'star';
+      star.style.left = Math.random()*100 + '%';
+      star.style.top = Math.random()*100 + '%';
+      star.style.animationDelay = Math.random()*3 + 's';
+      var size = Math.random()*2+1;
+      star.style.width = size + 'px';
+      star.style.height = size + 'px';
+      bgWrap.appendChild(star);
+    }
+    for(var j=0;j<15;j++){
+      var petal = document.createElement('div');
+      petal.className = 'sakura-petal';
+      petal.style.left = Math.random()*100 + '%';
+      petal.style.top = '-20px';
+      petal.style.animationDuration = (Math.random()*8+10) + 's';
+      petal.style.animationDelay = Math.random()*10 + 's';
+      var psize = Math.random()*10+8;
+      petal.style.width = psize + 'px';
+      petal.style.height = psize + 'px';
+      bgWrap.appendChild(petal);
+    }
+  }
+})();
+</script>
+</html>
