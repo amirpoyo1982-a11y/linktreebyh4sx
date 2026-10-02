@@ -490,6 +490,13 @@ body.theater main{
 .screen { height: 0; padding-top: 56.25%; }
 .screen > video, .screen > iframe, .screen > .placeholder { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 button:focus { outline: 3px solid #7dd3fc; outline-offset: 3px; }
+
+/* Fill the available screen; keep the image proportions. */
+.screen video { object-fit: cover; }
+.screen.original video { object-fit: contain; }
+.screen:fullscreen { width: 100vw; height: 100vh; padding-top: 0; border: 0; border-radius: 0; }
+.screen:-webkit-full-screen { width: 100%; height: 100%; padding-top: 0; border: 0; border-radius: 0; }
+.screen:-moz-full-screen { width: 100%; height: 100%; padding-top: 0; border: 0; border-radius: 0; }
 </style>
   </head>
   <body>
@@ -512,7 +519,7 @@ button:focus { outline: 3px solid #7dd3fc; outline-offset: 3px; }
       </div>
       <div class="layout">
         <section aria-label="Player video">
-          <div class="screen" id="screen"></div>
+          <div class="screen original" id="screen"></div>
           <p class="status" id="playerStatus" role="status" hidden></p>
           <div class="now">
             <div>
@@ -524,6 +531,9 @@ button:focus { outline: 3px solid #7dd3fc; outline-offset: 3px; }
               <button id="prev" aria-label="Episod sebelumnya">Sebelum</button>
               <button id="next" aria-label="Episod seterusnya">Seterusnya</button>
               <button id="theater" aria-pressed="false">Mod pawagam</button>
+              <button id="playVideo" class="primary">Main video</button>
+              <button id="fit" aria-pressed="false">Isi skrin</button>
+              <button id="fullscreen">Fullscreen</button>
             </div>
           </div>
           <p class="description" id="description"></p>
@@ -621,7 +631,7 @@ button:focus { outline: 3px solid #7dd3fc; outline-offset: 3px; }
       "type": "direct"
     }
   ],
-  "revision": 7
+  "revision": 9
 }
 </script>
     <script>
@@ -674,6 +684,7 @@ function render() {
   $('playerStatus').hidden = true;
   $('external').hidden = true;
   var url = safeUrl(ep.url);
+  $('playVideo').disabled = !url || ep.type === 'embed';
   clear($('screen'));
   if (!url) {
     placeholder('Episod ' + (selected + 1) + ' belum tersedia', 'Link video belum dimasukkan. Sila pilih episod lain atau kembali kemudian.');
@@ -785,6 +796,45 @@ $('next').onclick = function () { if (selected < config.episodes.length - 1) { s
 $('theater').onclick = function () {
   var enabled = document.body.classList.toggle('theater');
   $('theater').setAttribute('aria-pressed', String(enabled)); $('theater').textContent = enabled ? 'Mod biasa' : 'Mod pawagam';
+};
+$('fit').onclick = function () {
+  var original = $('screen').classList.toggle('original');
+  $('fit').textContent = original ? 'Isi skrin' : 'Saiz asal';
+  $('fit').setAttribute('aria-pressed', original ? 'false' : 'true');
+};
+$('playVideo').onclick = function () {
+  var video = $('screen').querySelector('video');
+  if (!video) return;
+  function showPlaybackError(error) {
+    var name = error && error.name;
+    var message = name === 'NotSupportedError'
+      ? 'Browser TV tidak menyokong video ini. Cuba buka video asal untuk semak formatnya.'
+      : name === 'NotAllowedError'
+      ? 'Browser menyekat playback. Cuba tekan Play pada kawalan video atau buka video asal.'
+      : 'Video gagal bermula' + (name ? ' (' + name + ')' : '') + '. Cuba Buka video asal.';
+    $('playerStatus').textContent = message;
+    $('playerStatus').hidden = false;
+  }
+  try {
+    var playing = video.play();
+    if (playing && playing.then) playing.then(function () {
+      $('playerStatus').hidden = true;
+    }, showPlaybackError);
+  } catch (error) { showPlaybackError(error); }
+};
+$('fullscreen').onclick = function () {
+  var screen = $('screen');
+  var request = screen.requestFullscreen || screen.webkitRequestFullscreen || screen.webkitRequestFullScreen || screen.mozRequestFullScreen || screen.msRequestFullscreen;
+  if (request) {
+    try {
+      var result = request.call(screen);
+      if (result && result.catch) result.catch(function () { toast('Fullscreen tidak dibenarkan oleh browser ini. Cuba butang fullscreen pada video.'); });
+    } catch (error) { toast('Cuba butang fullscreen pada video.'); }
+  } else {
+    var video = screen.querySelector('video');
+    if (video && video.webkitEnterFullscreen) video.webkitEnterFullscreen();
+    else toast('Gunakan butang fullscreen pada video.');
+  }
 };
 $('editToggle').hidden = !editable; $('editToggle').onclick = openEditor;
 $('closeEditor').onclick = function () { $('editor').hidden = true; };
