@@ -485,6 +485,11 @@ body.theater main{
     transition:background .15s,border-color .15s
   }
 }
+
+/* Video size fallback for older Smart TV browsers. */
+.screen { height: 0; padding-top: 56.25%; }
+.screen > video, .screen > iframe, .screen > .placeholder { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+button:focus { outline: 3px solid #7dd3fc; outline-offset: 3px; }
 </style>
   </head>
   <body>
@@ -616,287 +621,189 @@ body.theater main{
       "type": "direct"
     }
   ],
-  "revision": 6
+  "revision": 7
 }
 </script>
     <script>
 'use strict';
-const $=id=>document.getElementById(id), base=JSON.parse($('movie-config').textContent);
-const editable=!base.published || new URLSearchParams(location.search).get('edit')==='1';
-const storageKey='h4sx-movie-v1:'+location.pathname+':'+(base.revision||1);
-let config=structuredClone(base), selected=0, draft=[];
-if(editable){
-  try{
-    const saved=JSON.parse(localStorage.getItem(storageKey));
-    if(saved&&Array.isArray(saved.episodes)&&saved.episodes.length)config=saved;
-  }
-  catch{
-  }
+function $(id) { return document.getElementById(id); }
+function copy(value) { return JSON.parse(JSON.stringify(value)); }
+function clear(node) { while (node.firstChild) node.removeChild(node.firstChild); }
+function append(node) { for (var i = 1; i < arguments.length; i++) node.appendChild(arguments[i]); }
+function list(nodes) { return Array.prototype.slice.call(nodes); }
+var base = JSON.parse($('movie-config').textContent);
+var editable = !base.published || /(?:\?|&)edit=1(?:&|$)/.test(location.search);
+var storageKey = 'h4sx-movie-v1:' + location.pathname + ':' + (base.revision || 1);
+var config = copy(base), selected = 0, draft = [];
+if (editable) {
+  try {
+    var saved = JSON.parse(localStorage.getItem(storageKey));
+    if (saved && Array.isArray(saved.episodes) && saved.episodes.length) config = saved;
+  } catch (error) {}
 }
-function safeUrl(value){
-  if(!value)return '';
-  try{
-    const u=new URL(value);
-    return ['https:','http:'].includes(u.protocol)?u.href:'';
-  }
-  catch{
-    return '';
-  }
+function safeUrl(value) {
+  if (!value || !/^https?:\/\//i.test(value)) return '';
+  return value;
 }
-function toast(message){
-  $('toast').textContent=message;
-  $('toast').hidden=false;
+function toast(message) {
+  $('toast').textContent = message;
+  $('toast').hidden = false;
   clearTimeout(toast.timer);
-  toast.timer=setTimeout(()=>$('toast').hidden=true,3500);
+  toast.timer = setTimeout(function () { $('toast').hidden = true; }, 3500);
 }
-function placeholder(title,message){
-  const box=document.createElement('div');
-  box.className='placeholder';
-  const icon=document.createElement('div');
-  icon.className='playmark';
-  icon.textContent='▶';
-  const strong=document.createElement('strong');
-  strong.textContent=title;
-  const p=document.createElement('p');
-  p.textContent=message;
-  box.append(icon,strong,p);
-  $('screen').replaceChildren(box);
+function placeholder(title, message) {
+  var box = document.createElement('div'); box.className = 'placeholder';
+  var icon = document.createElement('div'); icon.className = 'playmark'; icon.textContent = '▶';
+  var strong = document.createElement('strong'); strong.textContent = title;
+  var p = document.createElement('p'); p.textContent = message;
+  append(box, icon, strong, p); clear($('screen')); append($('screen'), box);
 }
-function render(){
-  selected=Math.max(0,Math.min(selected,config.episodes.length-1));
-  const ep=config.episodes[selected];
-  document.title=config.title+' • H4SX Movie by Hasnain';
-  $('seriesTitle').textContent=config.title;
-  $('crumbTitle').textContent=config.title;
-  $('description').textContent=config.description;
-  $('episodeLabel').textContent='Sedang dipilih · Episod '+(selected+1);
-  $('episodeTitle').textContent=ep.title;
-  $('count').textContent=config.episodes.length+' episod';
-  $('totalBadge').textContent=config.episodes.length+' EPISOD';
-  $('prev').disabled=selected===0;
-  $('next').disabled=selected===config.episodes.length-1;
-  $('playerStatus').hidden=true;
-  $('external').hidden=true;
-  const url=safeUrl(ep.url);
-  $('screen').replaceChildren();
-  if(!url){
-    placeholder('Episod '+(selected+1)+' belum tersedia','Link video belum dimasukkan. Sila pilih episod lain atau kembali kemudian.');
-  }
-  else{
-    $('external').href=url;
-    $('external').hidden=false;
-    if(ep.type==='embed'){
-      const frame=document.createElement('iframe');
-      frame.src=url;
-      frame.title=ep.title;
-      frame.allow='fullscreen; picture-in-picture; encrypted-media';
-      frame.allowFullscreen=true;
-      frame.referrerPolicy='strict-origin-when-cross-origin';
-      $('screen').append(frame);
-      $('playerStatus').textContent='Jika player tidak muncul, cuba Buka video asal. Sesetengah penyedia menyekat embed.';
-      $('playerStatus').hidden=false;
+function render() {
+  selected = Math.max(0, Math.min(selected, config.episodes.length - 1));
+  var ep = config.episodes[selected];
+  document.title = config.title + ' • H4SX Movie by Hasnain';
+  $('seriesTitle').textContent = config.title;
+  $('crumbTitle').textContent = config.title;
+  $('description').textContent = config.description;
+  $('episodeLabel').textContent = 'Sedang dipilih · Episod ' + (selected + 1);
+  $('episodeTitle').textContent = ep.title;
+  $('count').textContent = config.episodes.length + ' episod';
+  $('totalBadge').textContent = config.episodes.length + ' EPISOD';
+  $('prev').disabled = selected === 0;
+  $('next').disabled = selected === config.episodes.length - 1;
+  $('playerStatus').hidden = true;
+  $('external').hidden = true;
+  var url = safeUrl(ep.url);
+  clear($('screen'));
+  if (!url) {
+    placeholder('Episod ' + (selected + 1) + ' belum tersedia', 'Link video belum dimasukkan. Sila pilih episod lain atau kembali kemudian.');
+  } else {
+    $('external').href = url; $('external').hidden = false;
+    if (ep.type === 'embed') {
+      var frame = document.createElement('iframe');
+      frame.src = url; frame.title = ep.title;
+      frame.setAttribute('allow', 'fullscreen; picture-in-picture; encrypted-media');
+      frame.setAttribute('allowfullscreen', '');
+      frame.referrerPolicy = 'strict-origin-when-cross-origin';
+      append($('screen'), frame);
+      $('playerStatus').textContent = 'Jika player tidak muncul, cuba Buka video asal. Sesetengah penyedia menyekat embed.';
+      $('playerStatus').hidden = false;
+    } else {
+      var video = document.createElement('video');
+      video.controls = true; video.setAttribute('playsinline', ''); video.preload = 'metadata';
+      if (safeUrl(config.poster)) video.poster = safeUrl(config.poster);
+      video.addEventListener('error', function () {
+        var code = video.error ? video.error.code : 0;
+        var messages = {
+          2: 'Video gagal dimuatkan. Semak internet atau link video yang mungkin sudah luput.',
+          3: 'Browser TV tidak dapat membaca format video ini. Cuba video MP4 dengan codec H.264 dan audio AAC.',
+          4: 'Link video atau formatnya tidak disokong oleh browser ini. Link mungkin sudah luput.'
+        };
+        $('playerStatus').textContent = messages[code] || 'Video tidak dapat dimainkan. Cuba Buka video asal.';
+        $('playerStatus').hidden = false;
+      });
+      video.src = url;
+      append($('screen'), video);
     }
-    else{
-      const video=document.createElement('video');
-      video.controls=true;
-      video.playsInline=true;
-      video.preload='metadata';
-      if(safeUrl(config.poster))video.poster=safeUrl(config.poster);
-      video.src=url;
-      video.addEventListener('error',()=>{
-        $('playerStatus').textContent='Video tidak dapat dimainkan. Semak link fail video atau tekan Buka video asal.';
-        $('playerStatus').hidden=false;
+  }
+  clear($('eplist'));
+  config.episodes.forEach(function (episode, i) {
+    var button = document.createElement('button');
+    button.className = 'episode' + (selected === i ? ' active' : '');
+    button.setAttribute('aria-current', selected === i ? 'true' : 'false');
+    var number = document.createElement('span'); number.className = 'epnum'; number.textContent = ('0' + (i + 1)).slice(-2);
+    var text = document.createElement('span'); text.className = 'eptext';
+    var title = document.createElement('span'); title.className = 'eptitle'; title.textContent = episode.title;
+    var meta = document.createElement('span'); meta.className = 'epmeta';
+    meta.textContent = selected === i ? 'Dipilih' : safeUrl(episode.url) ? 'Sedia ditonton' : 'Akan datang';
+    append(text, title, meta); append(button, number, text);
+    button.onclick = function () { selected = i; render(); };
+    append($('eplist'), button);
+  });
+}
+function drawRows() {
+  clear($('editRows'));
+  draft.forEach(function (ep, i) {
+    var row = document.createElement('div'); row.className = 'editrow';
+    var head = document.createElement('div'); head.className = 'rowhead';
+    var title = document.createElement('strong'); title.textContent = 'Episod ' + (i + 1);
+    var remove = document.createElement('button'); remove.className = 'danger'; remove.textContent = 'Buang'; remove.disabled = draft.length === 1;
+    remove.onclick = function () { collectRows(); draft.splice(i, 1); drawRows(); };
+    append(head, title, remove);
+    var fields = document.createElement('div'); fields.className = 'fields';
+    [['title', 'Nama episod'], ['type', 'Jenis link'], ['url', 'Link video']].forEach(function (field) {
+      var key = field[0], label = document.createElement('label'); label.textContent = field[1];
+      var input;
+      if (key === 'type') {
+        input = document.createElement('select');
+        [['direct', 'Video terus (MP4 / WebM)'], ['embed', 'Player embed']].forEach(function (item) {
+          var option = document.createElement('option'); option.value = item[0]; option.textContent = item[1]; append(input, option);
+        });
+      } else {
+        input = document.createElement('input'); input.type = key === 'url' ? 'url' : 'text';
+        if (key === 'url') input.placeholder = 'https://…';
       }
-      );
-      $('screen').append(video);
-    }
-  }
-  $('eplist').replaceChildren();
-  config.episodes.forEach((episode,i)=>{
-    const button=document.createElement('button');
-    button.className='episode'+(selected===i?' active':'');
-    button.setAttribute('aria-current',selected===i?'true':'false');
-    const number=document.createElement('span');
-    number.className='epnum';
-    number.textContent=String(i+1).padStart(2,'0');
-    const text=document.createElement('span');
-    text.className='eptext';
-    const title=document.createElement('span');
-    title.className='eptitle';
-    title.textContent=episode.title;
-    const meta=document.createElement('span');
-    meta.className='epmeta';
-    meta.textContent=selected===i?'Dipilih':safeUrl(episode.url)?'Sedia ditonton':'Akan datang';
-    text.append(title,meta);
-    button.append(number,text);
-    button.onclick=()=>{
-      selected=i;
-      render();
-    }
-    ;
-    $('eplist').append(button);
-  }
-  );
+      input.setAttribute('data-key', key); input.value = ep[key] || '';
+      append(label, input); if (key === 'url') label.className = 'full'; append(fields, label);
+    });
+    append(row, head, fields); append($('editRows'), row);
+  });
 }
-function drawRows(){
-  $('editRows').replaceChildren();
-  draft.forEach((ep,i)=>{
-    const row=document.createElement('div');
-    row.className='editrow';
-    const head=document.createElement('div');
-    head.className='rowhead';
-    const title=document.createElement('strong');
-    title.textContent='Episod '+(i+1);
-    const remove=document.createElement('button');
-    remove.className='danger';
-    remove.textContent='Buang';
-    remove.disabled=draft.length===1;
-    remove.onclick=()=>{
-      collectRows();
-      draft.splice(i,1);
-      drawRows();
-    }
-    ;
-    head.append(title,remove);
-    const fields=document.createElement('div');
-    fields.className='fields';
-    for(const [key,labelText] of [['title','Nama episod'],['type','Jenis link'],['url','Link video']]){
-      const label=document.createElement('label');
-      label.textContent=labelText;
-      let input;
-      if(key==='type'){
-        input=document.createElement('select');
-        for(const [value,text] of [['direct','Video terus (MP4 / WebM)'],['embed','Player embed']]){
-          const option=document.createElement('option');
-          option.value=value;
-          option.textContent=text;
-          input.append(option);
-        }
-      }
-      else{
-        input=document.createElement('input');
-        input.type=key==='url'?'url':'text';
-        if(key==='url')input.placeholder='https://…';
-      }
-      input.dataset.key=key;
-      input.value=ep[key]||'';
-      label.append(input);
-      if(key==='url')label.className='full';
-      fields.append(label);
-    }
-    row.append(head,fields);
-    $('editRows').append(row);
-  }
-  );
+function collectRows() {
+  draft = list($('editRows').children).map(function (row) {
+    var ep = {};
+    list(row.querySelectorAll('[data-key]')).forEach(function (input) { ep[input.getAttribute('data-key')] = input.value.trim(); });
+    return ep;
+  });
 }
-function collectRows(){
-  draft=[...$('editRows').children].map(row=>Object.fromEntries([...row.querySelectorAll('[data-key]')].map(input=>[input.dataset.key,input.value.trim()])));
+function openEditor() {
+  draft = copy(config.episodes);
+  $('editTitle').value = config.title; $('editDescription').value = config.description; $('editPoster').value = config.poster || '';
+  drawRows(); $('editor').hidden = false; $('editor').scrollIntoView(true);
 }
-function openEditor(){
-  draft=structuredClone(config.episodes);
-  $('editTitle').value=config.title;
-  $('editDescription').value=config.description;
-  $('editPoster').value=config.poster||'';
-  drawRows();
-  $('editor').hidden=false;
-  $('editor').scrollIntoView({
-    behavior:'smooth',block:'start'
-  }
-  );
-}
-function save(){
+function editError(message) { $('editStatus').textContent = message; $('editStatus').hidden = false; return false; }
+function save() {
   collectRows();
-  const poster=$('editPoster').value.trim();
-  if(poster&&!safeUrl(poster)){
-    return editError('Link poster mesti bermula dengan https:// atau http://.');
+  var poster = $('editPoster').value.trim();
+  if (poster && !safeUrl(poster)) return editError('Link poster mesti bermula dengan https:// atau http://.');
+  for (var i = 0; i < draft.length; i++) {
+    if (draft[i].url && !safeUrl(draft[i].url)) return editError('Link Episod ' + (i + 1) + ' tidak sah. Gunakan URL https:// atau http://.');
   }
-  const invalid=draft.findIndex(ep=>ep.url&&!safeUrl(ep.url));
-  if(invalid>=0)return editError('Link Episod '+(invalid+1)+' tidak sah. Gunakan URL https:// atau http://.');
-  config={
-    title:$('editTitle').value.trim()||'Siri Pilihan',description:$('editDescription').value.trim(),poster,published:base.published,revision:base.revision||1,episodes:draft.map((ep,i)=>({
-      ...ep,title:ep.title||'Episod '+(i+1)
-    }
-    ))
-  }
-  ;
-  $('editStatus').hidden=true;
-  try{
-    localStorage.setItem(storageKey,JSON.stringify(config));
-    toast('Perubahan disimpan pada browser ini.');
-  }
-  catch{
-    toast('Perubahan digunakan. Muat turun HTML untuk menyimpannya.');
-  }
-  render();
-  return true;
+  config = {
+    title: $('editTitle').value.trim() || 'Siri Pilihan',
+    description: $('editDescription').value.trim(), poster: poster,
+    published: base.published, revision: base.revision || 1,
+    episodes: draft.map(function (ep, i) { return { title: ep.title || 'Episod ' + (i + 1), url: ep.url, type: ep.type }; })
+  };
+  $('editStatus').hidden = true;
+  try { localStorage.setItem(storageKey, JSON.stringify(config)); toast('Perubahan disimpan pada browser ini.'); }
+  catch (error) { toast('Perubahan digunakan. Muat turun HTML untuk menyimpannya.'); }
+  render(); return true;
 }
-function editError(message){
-  $('editStatus').textContent=message;
-  $('editStatus').hidden=false;
-  return false;
-}
-$('prev').onclick=()=>{
-  if(selected>0){
-    selected--;
-    render();
-  }
-}
-;
-$('next').onclick=()=>{
-  if(selected<config.episodes.length-1){
-    selected++;
-    render();
-  }
-}
-;
-$('theater').onclick=()=>{
-  const enabled=document.body.classList.toggle('theater');
-  $('theater').setAttribute('aria-pressed',String(enabled));
-  $('theater').textContent=enabled?'Mod biasa':'Mod pawagam';
-}
-;
-$('editToggle').hidden=!editable;
-$('editToggle').onclick=openEditor;
-$('closeEditor').onclick=()=>{
-  $('editor').hidden=true;
-}
-;
-$('addEpisode').onclick=()=>{
-  collectRows();
-  draft.push({
-    title:'Episod '+(draft.length+1),url:'',type:'direct'
-  }
-  );
-  drawRows();
-}
-;
-$('save').onclick=save;
-$('download').onclick=()=>{
-  if(!save())return;
-  const clone=document.documentElement.cloneNode(true);
-  clone.querySelector('#movie-config').textContent=JSON.stringify({
-    ...config,published:true
-  }
-  ).replace(/</g,'\\u003c');
-  clone.querySelector('#editor').hidden=true;
-  clone.querySelector('#editToggle').hidden=true;
-  clone.querySelector('#toast').hidden=true;
-  clone.querySelector('#editRows').replaceChildren();
-  clone.querySelector('#screen').replaceChildren();
-  clone.querySelector('#eplist').replaceChildren();
-  const blob=new Blob(['<!doctype html>\n'+clone.outerHTML],{
-    type:'text/html;charset=utf-8'
-  }
-  );
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  a.href=url;
-  a.download='h4sx-movie.html';
-  a.click();
-  setTimeout(()=>URL.revokeObjectURL(url),1500);
+$('prev').onclick = function () { if (selected > 0) { selected--; render(); } };
+$('next').onclick = function () { if (selected < config.episodes.length - 1) { selected++; render(); } };
+$('theater').onclick = function () {
+  var enabled = document.body.classList.toggle('theater');
+  $('theater').setAttribute('aria-pressed', String(enabled)); $('theater').textContent = enabled ? 'Mod biasa' : 'Mod pawagam';
+};
+$('editToggle').hidden = !editable; $('editToggle').onclick = openEditor;
+$('closeEditor').onclick = function () { $('editor').hidden = true; };
+$('addEpisode').onclick = function () { collectRows(); draft.push({ title: 'Episod ' + (draft.length + 1), url: '', type: 'direct' }); drawRows(); };
+$('save').onclick = save;
+$('download').onclick = function () {
+  if (!save()) return;
+  var clone = document.documentElement.cloneNode(true);
+  var exported = copy(config); exported.published = true;
+  clone.querySelector('#movie-config').textContent = JSON.stringify(exported, null, 2).replace(/</g, '\\u003c');
+  clone.querySelector('#editor').hidden = true; clone.querySelector('#editToggle').hidden = true; clone.querySelector('#toast').hidden = true;
+  clear(clone.querySelector('#editRows')); clear(clone.querySelector('#screen')); clear(clone.querySelector('#eplist'));
+  var blob = new Blob(['<!doctype html>\n' + clone.outerHTML], { type: 'text/html;charset=utf-8' });
+  var urlApi = window.URL || window.webkitURL;
+  var url = urlApi.createObjectURL(blob); var a = document.createElement('a'); a.href = url; a.download = 'h4sx-movie.html';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(function () { urlApi.revokeObjectURL(url); }, 1500);
   toast('HTML siap dimuat turun. Upload fail ini ke hosting.');
-}
-;
+};
 render();
 </script>
   </body>
