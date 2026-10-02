@@ -1,0 +1,903 @@
+<!doctype html>
+<html lang="ms">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="#080e18">
+    <title>H4SX Movie • by Hasnain</title>
+    <style>
+:root{
+  color-scheme:dark;
+  --bg:#080e18;
+  --panel:#101b2a;
+  --line:#243244;
+  --muted:#9bacc1;
+  --blue:#7dd3fc;
+  --text:#f3f8ff
+}
+*{
+  box-sizing:border-box
+}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font:16px/1.6 system-ui,-apple-system,Segoe UI,sans-serif
+}
+button,input,textarea,select{
+  font:inherit
+}
+button,a,input,textarea,select{
+  outline-offset:4px
+}
+button{
+  cursor:pointer
+}
+a{
+  color:var(--blue)
+}
+button{
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:#162337;
+  color:var(--text);
+  padding:10px 16px
+}
+button:hover{
+  border-color:var(--blue)
+}
+button:disabled{
+  opacity:.4;
+  cursor:default
+}
+.primary{
+  background:var(--blue);
+  color:#07121e;
+  border-color:var(--blue);
+  font-weight:750
+}
+header{
+  border-bottom:1px solid var(--line);
+  background:#0c1421
+}
+.nav{
+  max-width:1320px;
+  margin:auto;
+  padding:20px 32px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px
+}
+.brand{
+  font-size:21px;
+  font-weight:900;
+  letter-spacing:-.7px
+}
+.brand span{
+  color:var(--blue)
+}
+.credit{
+  font-size:13px;
+  color:var(--muted);
+  letter-spacing:.4px
+}
+.navright{
+  display:flex;
+  gap:18px;
+  align-items:center
+}
+.storelink{
+  text-decoration:none;
+  font-size:14px
+}
+main{
+  max-width:1320px;
+  margin:auto;
+  padding:32px
+}
+.crumb{
+  color:var(--muted);
+  font-size:14px;
+  margin-bottom:24px
+}
+.crumb span{
+  color:var(--blue)
+}
+.layout{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 330px;
+  gap:24px;
+  align-items:start
+}
+.screen{
+  aspect-ratio:16/9;
+  position:relative;
+  background:#03070d;
+  border:1px solid var(--line);
+  border-radius:16px;
+  overflow:hidden
+}
+.screen video,.screen iframe{
+  width:100%;
+  height:100%;
+  border:0;
+  background:#000
+}
+.placeholder{
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  text-align:center;
+  background:radial-gradient(ellipse at top,#132b43,transparent 70%)
+}
+.playmark{
+  width:64px;
+  height:64px;
+  border:1px solid #41607b;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  color:var(--blue);
+  font-size:26px;
+  margin-bottom:20px
+}
+.placeholder strong{
+  font-size:22px
+}
+.placeholder p{
+  color:var(--muted);
+  max-width:380px;
+  margin:8px 0 0;
+  font-size:14px
+}
+.now{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  margin-top:22px
+}
+.eyebrow{
+  color:var(--blue);
+  font-size:12px;
+  letter-spacing:2px;
+  font-weight:750;
+  text-transform:uppercase
+}
+h1{
+  font-size:clamp(25px,3vw,36px);
+  line-height:1.25;
+  margin:8px 0
+}
+h2{
+  font-size:19px;
+  margin:0
+}
+.subtitle{
+  color:var(--muted);
+  margin:4px 0;
+  font-size:14px
+}
+.epcontrols{
+  display:flex;
+  gap:8px;
+  flex-shrink:0
+}
+.epcontrols button{
+  padding:9px 13px;
+  font-size:14px
+}
+.description{
+  color:#bac8d9;
+  max-width:750px;
+  margin-top:24px
+}
+.info{
+  border-top:1px solid var(--line);
+  padding-top:20px;
+  margin-top:24px;
+  display:flex;
+  gap:10px;
+  align-items:center
+}
+.badge{
+  font-size:12px;
+  border:1px solid var(--line);
+  padding:3px 9px;
+  border-radius:6px;
+  color:var(--muted)
+}
+aside{
+  background:#0d1725;
+  border:1px solid var(--line);
+  border-radius:16px;
+  overflow:hidden
+}
+.asidehead{
+  padding:21px 20px;
+  border-bottom:1px solid var(--line);
+  display:flex;
+  justify-content:space-between;
+  align-items:center
+}
+.count{
+  font-size:13px;
+  color:var(--muted)
+}
+.eplist{
+  padding:10px;
+  display:grid;
+  gap:6px;
+  max-height:590px;
+  overflow:auto
+}
+.episode{
+  display:flex;
+  text-align:left;
+  gap:13px;
+  align-items:center;
+  width:100%;
+  border-color:transparent;
+  background:transparent;
+  padding:12px 10px
+}
+.episode.active{
+  background:#17324b;
+  border-color:#345b79
+}
+.epnum{
+  height:45px;
+  width:48px;
+  display:grid;
+  place-items:center;
+  border:1px solid var(--line);
+  background:#111f30;
+  border-radius:8px;
+  color:var(--muted);
+  font-weight:750;
+  flex-shrink:0
+}
+.active .epnum{
+  background:var(--blue);
+  color:#082039
+}
+.eptitle{
+  display:block;
+  font-size:14px;
+  font-weight:650;
+  line-height:1.4
+}
+.epmeta{
+  display:block;
+  font-size:12px;
+  color:var(--muted);
+  margin-top:4px
+}
+.eptext{
+  min-width:0;
+  overflow-wrap:anywhere
+}
+.note{
+  font-size:13px;
+  color:var(--muted);
+  padding:15px 20px;
+  border-top:1px solid var(--line)
+}
+footer{
+  max-width:1256px;
+  margin:48px auto 0;
+  border-top:1px solid var(--line);
+  padding:22px 0 30px;
+  display:flex;
+  justify-content:space-between;
+  color:var(--muted);
+  font-size:13px;
+  gap:12px
+}
+.status{
+  color:#f9c988;
+  font-size:14px;
+  margin:12px 0
+}
+.editor{
+  background:#101b2a;
+  border:1px solid #345b79;
+  border-radius:16px;
+  padding:24px;
+  margin-top:32px
+}
+.editorhead{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+  margin-bottom:12px
+}
+.help{
+  font-size:14px;
+  color:var(--muted)
+}
+.fields{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px
+}
+label{
+  display:block;
+  font-size:14px;
+  color:#c2d0e0
+}
+input,textarea,select{
+  display:block;
+  width:100%;
+  margin-top:6px;
+  color:var(--text);
+  background:#080f1a;
+  border:1px solid #34475e;
+  border-radius:8px;
+  padding:10px 12px
+}
+textarea{
+  min-height:85px;
+  resize:vertical
+}
+.full{
+  grid-column:1/-1
+}
+.editrow{
+  padding:18px 0;
+  border-bottom:1px solid var(--line)
+}
+.rowhead{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:12px
+}
+.danger{
+  color:#ffb2b2;
+  font-size:13px;
+  padding:5px 10px
+}
+.actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:20px
+}
+.toast{
+  position:fixed;
+  bottom:24px;
+  left:50%;
+  transform:translateX(-50%);
+  max-width:90%;
+  background:#c7edff;
+  color:#071b2e;
+  padding:12px 20px;
+  border-radius:10px;
+  box-shadow:0 6px 30px #0008;
+  z-index:5
+}
+body.theater .layout{
+  grid-template-columns:1fr
+}
+body.theater aside{
+  max-width:none
+}
+body.theater .eplist{
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  max-height:none
+}
+body.theater main{
+  max-width:1500px
+}
+[hidden]{
+  display:none!important
+}
+@media(max-width:1000px){
+  .layout{
+    grid-template-columns:minmax(0,1fr) 280px
+  }
+  .now{
+    align-items:flex-start;
+    flex-direction:column
+  }
+}
+@media(max-width:760px){
+  .nav{
+    padding:16px 18px
+  }
+  .brand{
+    font-size:19px
+  }
+  .storelink{
+    display:none
+  }
+  main{
+    padding:24px 16px
+  }
+  .layout{
+    grid-template-columns:1fr
+  }
+  .screen{
+    border-radius:12px
+  }
+  .eplist{
+    grid-template-columns:1fr 1fr;
+    max-height:none
+  }
+  .asidehead{
+    padding:17px
+  }
+  .episode{
+    padding:10px 6px;
+    gap:9px
+  }
+  .epnum{
+    width:34px;
+    height:39px;
+    font-size:14px
+  }
+  .eptitle{
+    font-size:14px
+  }
+  .epmeta{
+    font-size:12px
+  }
+  .epcontrols{
+    flex-wrap:wrap
+  }
+  .fields{
+    grid-template-columns:1fr
+  }
+  .full{
+    grid-column:auto
+  }
+  .editor{
+    padding:17px
+  }
+  .navright{
+    gap:8px
+  }
+  footer{
+    margin-top:30px;
+    flex-direction:column
+  }
+  .placeholder strong{
+    font-size:18px
+  }
+  .playmark{
+    width:46px;
+    height:46px;
+    font-size:20px;
+    margin-bottom:12px
+  }
+  body.theater .eplist{
+    grid-template-columns:1fr 1fr
+  }
+}
+@media(prefers-reduced-motion:no-preference){
+  button{
+    transition:background .15s,border-color .15s
+  }
+}
+</style>
+  </head>
+  <body>
+    <header>
+      <div class="nav">
+        <div>
+          <div class="brand">H4SX <span>MOVIE</span>
+          </div>
+          <div class="credit">by Hasnain · H4SX Store</div>
+        </div>
+        <div class="navright">
+          <a class="storelink" href="https://www.h4sxmy.xyz" target="_blank" rel="noopener">H4SX Store</a>
+          <button id="editToggle" hidden>Edit episod</button>
+        </div>
+      </div>
+    </header>
+    <main>
+      <div class="crumb">H4SX Movie <span>/</span>
+        <span id="crumbTitle">Siri Pilihan</span>
+      </div>
+      <div class="layout">
+        <section aria-label="Player video">
+          <div class="screen" id="screen"></div>
+          <p class="status" id="playerStatus" role="status" hidden></p>
+          <div class="now">
+            <div>
+              <div class="eyebrow" id="episodeLabel"></div>
+              <h1 id="seriesTitle"></h1>
+              <p class="subtitle" id="episodeTitle"></p>
+            </div>
+            <div class="epcontrols">
+              <button id="prev" aria-label="Episod sebelumnya">Sebelum</button>
+              <button id="next" aria-label="Episod seterusnya">Seterusnya</button>
+              <button id="theater" aria-pressed="false">Mod pawagam</button>
+            </div>
+          </div>
+          <p class="description" id="description"></p>
+          <div class="info">
+            <span class="badge">SIRI</span>
+            <span class="badge" id="totalBadge"></span>
+            <a id="external" href="#" target="_blank" rel="noopener noreferrer" hidden>Buka video asal</a>
+          </div>
+        </section>
+        <aside>
+          <div class="asidehead">
+            <h2>Senarai episod</h2>
+            <span class="count" id="count"></span>
+          </div>
+          <div class="eplist" id="eplist"></div>
+          <div class="note">Pilih episod untuk mula menonton.</div>
+        </aside>
+      </div>
+      <section class="editor" id="editor" hidden>
+        <div class="editorhead">
+          <h2>Tetapan movie</h2>
+          <button id="closeEditor">Tutup</button>
+        </div>
+        <p class="help">Isi link video kemudian tekan Simpan. Tetapan disimpan pada browser ini. Untuk orang lain melihat perubahan, muat turun HTML siap dan upload fail itu ke hosting.</p>
+        <div class="fields">
+          <label>Tajuk siri<input id="editTitle" maxlength="150">
+          </label>
+          <label>Link poster / thumbnail (pilihan)<input id="editPoster" type="url" placeholder="https://…">
+          </label>
+          <label class="full">Sinopsis<textarea id="editDescription" maxlength="2000"></textarea>
+          </label>
+        </div>
+        <p class="help">Pilih Video terus untuk URL fail video seperti MP4. Pilih Embed untuk URL player embed yang diberikan oleh penyedia video. Link halaman download / perkongsian biasa mungkin tidak boleh dimainkan di sini.</p>
+        <div id="editRows"></div>
+        <div class="actions">
+          <button id="addEpisode">+ Tambah episod</button>
+          <button id="save" class="primary">Simpan perubahan</button>
+          <button id="download">Muat turun HTML siap</button>
+        </div>
+        <p class="status" id="editStatus" role="status" hidden></p>
+        <p class="help">Fail yang dimuat turun membuka paparan penonton. Untuk edit semula, tambah <b>?edit=1</b> pada URL. Ini editor setempat, bukan panel admin dengan login.</p>
+      </section>
+      <footer>
+        <span>H4SX Movie · by Hasnain</span>
+        <span>Powered by H4SX Store</span>
+      </footer>
+    </main>
+    <div id="toast" class="toast" role="status" hidden></div>
+    <!-- EDIT EPISODES BELOW: url = video link, type = direct or embed. Empty url means coming soon. -->
+    <script id="movie-config" type="application/json">
+{
+  "title": "Siri Pilihan",
+  "description": "Ruang movie H4SX Store. Pilih episod di sebelah untuk menonton. Tajuk dan sinopsis boleh ditukar mengikut siri pilihan anda.",
+  "poster": "",
+  "published": false,
+  "episodes": [
+    {
+      "title": "Episod 1",
+      "url": "https://storage.googleapis.com/store-screenapp-v2-production/files/6abf5ed8e71e8a5d8970f096/6abf5edbbd6e861156fbd994/video.mp4?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=GOOG1EINEQV5X2QGY62PSZMBMUR7IGGVLKNDB6ABP5GL6O6FKO76DWA2IE3SB%2F20261002%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20261002T073641Z&X-Amz-Expires=21600&X-Amz-Signature=2bce2ecd4f22be3d2c3a21cbe072425fadb56d916b5340c6b7bcd32ba5a48f5f&X-Amz-SignedHeaders=host&response-content-type=video%2Fmp4&x-id=GetObject",
+      "type": "direct"
+    },
+    {
+      "title": "Episod 2",
+      "url": "https://storage.googleapis.com/store-screenapp-v2-production/files/6abf5ed8e71e8a5d8970f096/6abf5f5b3374944ef0cd4d40/video.mp4?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=GOOG1EINEQV5X2QGY62PSZMBMUR7IGGVLKNDB6ABP5GL6O6FKO76DWA2IE3SB%2F20261002%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20261002T074238Z&X-Amz-Expires=21600&X-Amz-Signature=e50cfb107fc03941b5e22ed715c8f066618ab41b4b605c4b8e9c5484ddcf959e&X-Amz-SignedHeaders=host&response-content-type=video%2Fmp4&x-id=GetObject",
+      "type": "direct"
+    },
+    {
+      "title": "Episod 3",
+      "url": "",
+      "type": "direct"
+    },
+    {
+      "title": "Episod 4",
+      "url": "",
+      "type": "direct"
+    },
+    {
+      "title": "Episod 5",
+      "url": "",
+      "type": "direct"
+    },
+    {
+      "title": "Episod 6",
+      "url": "",
+      "type": "direct"
+    },
+    {
+      "title": "Episod 7",
+      "url": "",
+      "type": "direct"
+    },
+    {
+      "title": "Episod 8",
+      "url": "",
+      "type": "direct"
+    }
+  ],
+  "revision": 6
+}
+</script>
+    <script>
+'use strict';
+const $=id=>document.getElementById(id), base=JSON.parse($('movie-config').textContent);
+const editable=!base.published || new URLSearchParams(location.search).get('edit')==='1';
+const storageKey='h4sx-movie-v1:'+location.pathname+':'+(base.revision||1);
+let config=structuredClone(base), selected=0, draft=[];
+if(editable){
+  try{
+    const saved=JSON.parse(localStorage.getItem(storageKey));
+    if(saved&&Array.isArray(saved.episodes)&&saved.episodes.length)config=saved;
+  }
+  catch{
+  }
+}
+function safeUrl(value){
+  if(!value)return '';
+  try{
+    const u=new URL(value);
+    return ['https:','http:'].includes(u.protocol)?u.href:'';
+  }
+  catch{
+    return '';
+  }
+}
+function toast(message){
+  $('toast').textContent=message;
+  $('toast').hidden=false;
+  clearTimeout(toast.timer);
+  toast.timer=setTimeout(()=>$('toast').hidden=true,3500);
+}
+function placeholder(title,message){
+  const box=document.createElement('div');
+  box.className='placeholder';
+  const icon=document.createElement('div');
+  icon.className='playmark';
+  icon.textContent='▶';
+  const strong=document.createElement('strong');
+  strong.textContent=title;
+  const p=document.createElement('p');
+  p.textContent=message;
+  box.append(icon,strong,p);
+  $('screen').replaceChildren(box);
+}
+function render(){
+  selected=Math.max(0,Math.min(selected,config.episodes.length-1));
+  const ep=config.episodes[selected];
+  document.title=config.title+' • H4SX Movie by Hasnain';
+  $('seriesTitle').textContent=config.title;
+  $('crumbTitle').textContent=config.title;
+  $('description').textContent=config.description;
+  $('episodeLabel').textContent='Sedang dipilih · Episod '+(selected+1);
+  $('episodeTitle').textContent=ep.title;
+  $('count').textContent=config.episodes.length+' episod';
+  $('totalBadge').textContent=config.episodes.length+' EPISOD';
+  $('prev').disabled=selected===0;
+  $('next').disabled=selected===config.episodes.length-1;
+  $('playerStatus').hidden=true;
+  $('external').hidden=true;
+  const url=safeUrl(ep.url);
+  $('screen').replaceChildren();
+  if(!url){
+    placeholder('Episod '+(selected+1)+' belum tersedia','Link video belum dimasukkan. Sila pilih episod lain atau kembali kemudian.');
+  }
+  else{
+    $('external').href=url;
+    $('external').hidden=false;
+    if(ep.type==='embed'){
+      const frame=document.createElement('iframe');
+      frame.src=url;
+      frame.title=ep.title;
+      frame.allow='fullscreen; picture-in-picture; encrypted-media';
+      frame.allowFullscreen=true;
+      frame.referrerPolicy='strict-origin-when-cross-origin';
+      $('screen').append(frame);
+      $('playerStatus').textContent='Jika player tidak muncul, cuba Buka video asal. Sesetengah penyedia menyekat embed.';
+      $('playerStatus').hidden=false;
+    }
+    else{
+      const video=document.createElement('video');
+      video.controls=true;
+      video.playsInline=true;
+      video.preload='metadata';
+      if(safeUrl(config.poster))video.poster=safeUrl(config.poster);
+      video.src=url;
+      video.addEventListener('error',()=>{
+        $('playerStatus').textContent='Video tidak dapat dimainkan. Semak link fail video atau tekan Buka video asal.';
+        $('playerStatus').hidden=false;
+      }
+      );
+      $('screen').append(video);
+    }
+  }
+  $('eplist').replaceChildren();
+  config.episodes.forEach((episode,i)=>{
+    const button=document.createElement('button');
+    button.className='episode'+(selected===i?' active':'');
+    button.setAttribute('aria-current',selected===i?'true':'false');
+    const number=document.createElement('span');
+    number.className='epnum';
+    number.textContent=String(i+1).padStart(2,'0');
+    const text=document.createElement('span');
+    text.className='eptext';
+    const title=document.createElement('span');
+    title.className='eptitle';
+    title.textContent=episode.title;
+    const meta=document.createElement('span');
+    meta.className='epmeta';
+    meta.textContent=selected===i?'Dipilih':safeUrl(episode.url)?'Sedia ditonton':'Akan datang';
+    text.append(title,meta);
+    button.append(number,text);
+    button.onclick=()=>{
+      selected=i;
+      render();
+    }
+    ;
+    $('eplist').append(button);
+  }
+  );
+}
+function drawRows(){
+  $('editRows').replaceChildren();
+  draft.forEach((ep,i)=>{
+    const row=document.createElement('div');
+    row.className='editrow';
+    const head=document.createElement('div');
+    head.className='rowhead';
+    const title=document.createElement('strong');
+    title.textContent='Episod '+(i+1);
+    const remove=document.createElement('button');
+    remove.className='danger';
+    remove.textContent='Buang';
+    remove.disabled=draft.length===1;
+    remove.onclick=()=>{
+      collectRows();
+      draft.splice(i,1);
+      drawRows();
+    }
+    ;
+    head.append(title,remove);
+    const fields=document.createElement('div');
+    fields.className='fields';
+    for(const [key,labelText] of [['title','Nama episod'],['type','Jenis link'],['url','Link video']]){
+      const label=document.createElement('label');
+      label.textContent=labelText;
+      let input;
+      if(key==='type'){
+        input=document.createElement('select');
+        for(const [value,text] of [['direct','Video terus (MP4 / WebM)'],['embed','Player embed']]){
+          const option=document.createElement('option');
+          option.value=value;
+          option.textContent=text;
+          input.append(option);
+        }
+      }
+      else{
+        input=document.createElement('input');
+        input.type=key==='url'?'url':'text';
+        if(key==='url')input.placeholder='https://…';
+      }
+      input.dataset.key=key;
+      input.value=ep[key]||'';
+      label.append(input);
+      if(key==='url')label.className='full';
+      fields.append(label);
+    }
+    row.append(head,fields);
+    $('editRows').append(row);
+  }
+  );
+}
+function collectRows(){
+  draft=[...$('editRows').children].map(row=>Object.fromEntries([...row.querySelectorAll('[data-key]')].map(input=>[input.dataset.key,input.value.trim()])));
+}
+function openEditor(){
+  draft=structuredClone(config.episodes);
+  $('editTitle').value=config.title;
+  $('editDescription').value=config.description;
+  $('editPoster').value=config.poster||'';
+  drawRows();
+  $('editor').hidden=false;
+  $('editor').scrollIntoView({
+    behavior:'smooth',block:'start'
+  }
+  );
+}
+function save(){
+  collectRows();
+  const poster=$('editPoster').value.trim();
+  if(poster&&!safeUrl(poster)){
+    return editError('Link poster mesti bermula dengan https:// atau http://.');
+  }
+  const invalid=draft.findIndex(ep=>ep.url&&!safeUrl(ep.url));
+  if(invalid>=0)return editError('Link Episod '+(invalid+1)+' tidak sah. Gunakan URL https:// atau http://.');
+  config={
+    title:$('editTitle').value.trim()||'Siri Pilihan',description:$('editDescription').value.trim(),poster,published:base.published,revision:base.revision||1,episodes:draft.map((ep,i)=>({
+      ...ep,title:ep.title||'Episod '+(i+1)
+    }
+    ))
+  }
+  ;
+  $('editStatus').hidden=true;
+  try{
+    localStorage.setItem(storageKey,JSON.stringify(config));
+    toast('Perubahan disimpan pada browser ini.');
+  }
+  catch{
+    toast('Perubahan digunakan. Muat turun HTML untuk menyimpannya.');
+  }
+  render();
+  return true;
+}
+function editError(message){
+  $('editStatus').textContent=message;
+  $('editStatus').hidden=false;
+  return false;
+}
+$('prev').onclick=()=>{
+  if(selected>0){
+    selected--;
+    render();
+  }
+}
+;
+$('next').onclick=()=>{
+  if(selected<config.episodes.length-1){
+    selected++;
+    render();
+  }
+}
+;
+$('theater').onclick=()=>{
+  const enabled=document.body.classList.toggle('theater');
+  $('theater').setAttribute('aria-pressed',String(enabled));
+  $('theater').textContent=enabled?'Mod biasa':'Mod pawagam';
+}
+;
+$('editToggle').hidden=!editable;
+$('editToggle').onclick=openEditor;
+$('closeEditor').onclick=()=>{
+  $('editor').hidden=true;
+}
+;
+$('addEpisode').onclick=()=>{
+  collectRows();
+  draft.push({
+    title:'Episod '+(draft.length+1),url:'',type:'direct'
+  }
+  );
+  drawRows();
+}
+;
+$('save').onclick=save;
+$('download').onclick=()=>{
+  if(!save())return;
+  const clone=document.documentElement.cloneNode(true);
+  clone.querySelector('#movie-config').textContent=JSON.stringify({
+    ...config,published:true
+  }
+  ).replace(/</g,'\\u003c');
+  clone.querySelector('#editor').hidden=true;
+  clone.querySelector('#editToggle').hidden=true;
+  clone.querySelector('#toast').hidden=true;
+  clone.querySelector('#editRows').replaceChildren();
+  clone.querySelector('#screen').replaceChildren();
+  clone.querySelector('#eplist').replaceChildren();
+  const blob=new Blob(['<!doctype html>\n'+clone.outerHTML],{
+    type:'text/html;charset=utf-8'
+  }
+  );
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download='h4sx-movie.html';
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1500);
+  toast('HTML siap dimuat turun. Upload fail ini ke hosting.');
+}
+;
+render();
+</script>
+  </body>
+</html>
